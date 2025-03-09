@@ -13,6 +13,24 @@ type CertificateRepository struct {
 	mock.Mock
 }
 
+// Delete provides a mock function with given fields: _a0
+func (_m *CertificateRepository) Delete(_a0 *entity.Certificate) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*entity.Certificate) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Find provides a mock function with given fields: id
 func (_m *CertificateRepository) Find(id uint) (*entity.Certificate, error) {
 	ret := _m.Called(id)
@@ -49,6 +67,24 @@ func (_m *CertificateRepository) Save(_a0 *entity.Certificate) error {
 
 	if len(ret) == 0 {
 		panic("no return value specified for Save")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*entity.Certificate) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Update provides a mock function with given fields: _a0
+func (_m *CertificateRepository) Update(_a0 *entity.Certificate) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
 	}
 
 	var r0 error

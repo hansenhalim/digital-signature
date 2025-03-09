@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetCertificateByID(t *testing.T) {
+func TestGetByID(t *testing.T) {
 	oldTime, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z07:00")
 
 	mockCertificateRepo := new(mocks.CertificateRepository)
@@ -28,7 +28,6 @@ func TestGetCertificateByID(t *testing.T) {
 		Once()
 
 	certificateUseCase := certificate.NewUseCase(mockCertificateRepo)
-
 	certificate, err := certificateUseCase.GetByID(mockCertificate.ID)
 
 	assert.NoError(t, err)
