@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"digital-signature/certificate"
 	"digital-signature/entity"
-	postgresqlRepo "digital-signature/internal/repository/postgresql"
+	pgsqlRepo "digital-signature/internal/repository/pgsql"
 	"fmt"
 	"log"
 	"os"
@@ -46,10 +46,10 @@ func main() {
 		}
 	}()
 
-	certificateRepo := postgresqlRepo.NewCertificateRepository(dbConn)
-	uc := certificate.NewUseCase(certificateRepo)
+	certificateRepo := pgsqlRepo.NewCertificateRepository(dbConn)
+	certificateUseCase := certificate.NewUseCase(certificateRepo)
 
-	uc.Enroll(&entity.Certificate{
+	certificateUseCase.Enroll(&entity.Certificate{
 		Name:      "IDAS CA DS G1",
 		Issuer:    "Root CA Indonesia DS G1",
 		ExpiresAt: time.Now().AddDate(1, 0, 0),
