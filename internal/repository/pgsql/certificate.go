@@ -14,7 +14,7 @@ func NewCertificateRepository(conn *sql.DB) *CertificateRepository {
 }
 
 func (p *CertificateRepository) Find(id uint) (certificate *entity.Certificate, err error) {
-	query := `SELECT id, name, issuer, expires_at FROM certificates WHERE id = $1`
+	query := "SELECT id, name, issuer, expires_at FROM certificates WHERE id = $1"
 
 	// Initialize the Certificate struct
 	certificate = &entity.Certificate{}
@@ -34,7 +34,7 @@ func (p *CertificateRepository) Find(id uint) (certificate *entity.Certificate, 
 }
 
 func (p *CertificateRepository) Save(certificate *entity.Certificate) (err error) {
-	query := `INSERT INTO certificates (name, issuer, expires_at) VALUES ($1, $2, $3) RETURNING id`
+	query := "INSERT INTO certificates (name, issuer, expires_at) VALUES ($1, $2, $3) RETURNING id"
 
 	// Execute the query and scan the returned ID into the certificate struct
 	err = p.Conn.QueryRow(query, certificate.Name, certificate.Issuer, certificate.ExpiresAt).Scan(&certificate.ID)
@@ -46,7 +46,7 @@ func (p *CertificateRepository) Save(certificate *entity.Certificate) (err error
 }
 
 func (p *CertificateRepository) Delete(certificate *entity.Certificate) (err error) {
-	query := `DELETE FROM certificates WHERE id = $1`
+	query := "DELETE FROM certificates WHERE id = $1"
 
 	// Execute the delete query
 	_, err = p.Conn.Exec(query, certificate.ID)
@@ -58,7 +58,7 @@ func (p *CertificateRepository) Delete(certificate *entity.Certificate) (err err
 }
 
 func (p *CertificateRepository) Update(certificate *entity.Certificate) (err error) {
-	query := `UPDATE certificates SET name = $1, issuer = $2, expires_at = $3 WHERE id = $4`
+	query := "UPDATE certificates SET name = $1, issuer = $2, expires_at = $3 WHERE id = $4"
 
 	// Execute the update query
 	_, err = p.Conn.Exec(query, certificate.Name, certificate.Issuer, certificate.ExpiresAt, certificate.ID)

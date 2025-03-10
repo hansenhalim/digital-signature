@@ -29,11 +29,13 @@ func main() {
 	dbName := os.Getenv("DB_DATABASE")
 	dbUser := os.Getenv("DB_USERNAME")
 	dbPass := os.Getenv("DB_PASSWORD")
+
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
-	dbConn, err := sql.Open(`postgres`, dsn)
+	dbConn, err := sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal("failed to open connection to database", err)
 	}
+
 	err = dbConn.Ping()
 	if err != nil {
 		log.Fatal("failed to ping database ", err)
@@ -49,11 +51,22 @@ func main() {
 	certificateRepo := pgsqlRepo.NewCertificateRepository(dbConn)
 	certificateUseCase := certificate.NewUseCase(certificateRepo)
 
-	certificateUseCase.Enroll(&entity.Certificate{
+	err = certificateUseCase.Enroll(&entity.Certificate{
 		Name:      "IDAS CA DS G1",
 		Issuer:    "Root CA Indonesia DS G1",
 		ExpiresAt: time.Now().AddDate(1, 0, 0),
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Println("Certificate Enrolled successfully!")
+
+	// c, err := certificateUseCase.GetByID(10)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// log.Printf("| %d | %s | %s | %s |", c.ID, c.Name, c.Issuer, c.ExpiresAt)
+	// log.Println("Successfully get Certificate!")
 }
