@@ -16,10 +16,10 @@ func NewUseCase(signatureRepo SignatureRepository) *UseCase {
 	return &UseCase{signatureRepo}
 }
 
-func (uc *UseCase) GetByID(id uint) (*entity.Signature, error) {
-	return uc.signatureRepo.Find(id)
+func (s *UseCase) GetByID(id uint) (*entity.Signature, error) {
+	return s.signatureRepo.Find(id)
 }
 
-func (uc *UseCase) Store(signature *entity.Signature) error {
-	return uc.signatureRepo.Save(signature)
+func (s *UseCase) Store(signature *entity.Signature) error {
+	return s.signatureRepo.Save(signature)
 }

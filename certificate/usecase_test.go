@@ -39,3 +39,11 @@ func TestGetByID(t *testing.T) {
 func TestEnroll(t *testing.T) {
 
 }
+
+func TestRevoke(t *testing.T) {
+
+}
+
+func TestRenew(t *testing.T) {
+
+}

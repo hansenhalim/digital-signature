@@ -16,10 +16,10 @@ func NewUseCase(documentRepo DocumentRepository) *UseCase {
 	return &UseCase{documentRepo}
 }
 
-func (uc *UseCase) GetByID(id uint) (*entity.Document, error) {
-	return uc.documentRepo.Find(id)
+func (d *UseCase) GetByID(id uint) (*entity.Document, error) {
+	return d.documentRepo.Find(id)
 }
 
-func (uc *UseCase) Store(Document *entity.Document) error {
-	return uc.documentRepo.Save(Document)
+func (d *UseCase) Store(Document *entity.Document) error {
+	return d.documentRepo.Save(Document)
 }
