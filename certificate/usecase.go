@@ -2,6 +2,7 @@ package certificate
 
 import (
 	"digital-signature/entity"
+	"time"
 )
 
 //go:generate mockery --name CertificateRepository
@@ -33,6 +34,7 @@ func (c *UseCase) GetByID(id uint) (certificate *entity.Certificate, err error) 
 func (c *UseCase) Enroll(certificate *entity.Certificate) (err error) {
 	/* TODO: Call Enroll CA lib */
 
+	certificate.ExpiresAt = time.Now().AddDate(1, 0, 0)
 	// Persist Certificate to DB
 	err = c.certificateRepo.Save(certificate)
 	if err != nil {
