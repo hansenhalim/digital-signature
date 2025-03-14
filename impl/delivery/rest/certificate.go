@@ -3,6 +3,8 @@ package rest
 import (
 	"digital-signature/certificate"
 	"digital-signature/entity"
+	"digital-signature/impl/delivery/rest/request"
+	"digital-signature/impl/delivery/rest/response"
 	"net/http"
 	"strconv"
 
@@ -44,26 +46,30 @@ func (r *CertificateHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, certificate)
 }
 
-func isRequestValid(m *entity.Certificate) (bool, error) {
+func isRequestValid(m *request.EnrollCertificate) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(m)
 	if err != nil {
 		return false, err
 	}
 	return true, nil
-
 }
 
 func (r *CertificateHandler) Enroll(c echo.Context) (err error) {
-	var certificate entity.Certificate
-	err = c.Bind(&certificate) //Please dont do this!
+	var enrollRequest request.EnrollCertificate
+	err = c.Bind(&enrollRequest)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	var ok bool
-	if ok, err = isRequestValid(&certificate); !ok {
+	if ok, err = isRequestValid(&enrollRequest); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	certificate := entity.Certificate{
+		Name:   enrollRequest.CertName,
+		Issuer: enrollRequest.CertIssuer,
 	}
 
 	err = r.UseCase.Enroll(&certificate)
@@ -71,7 +77,13 @@ func (r *CertificateHandler) Enroll(c echo.Context) (err error) {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, nil)
+	enrollResponse := response.EnrollCertificate{
+		CertificateName:      certificate.Name,
+		CertificateIssuer:    certificate.Issuer,
+		CertificateExpiresAt: certificate.ExpiresAt,
+	}
+
+	return c.JSON(http.StatusCreated, enrollResponse)
 }
 
 func getStatusCode(err error) int {

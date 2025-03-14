@@ -5,7 +5,8 @@ import (
 	"digital-signature/certificate"
 	"digital-signature/impl/delivery/rest"
 	"digital-signature/impl/delivery/rest/middleware"
-	pgsqlRepo "digital-signature/impl/repository/pgsql"
+	"digital-signature/impl/lib/emudhra"
+	"digital-signature/impl/repository/pgsql"
 	"fmt"
 	"log"
 	"os"
@@ -68,10 +69,13 @@ func main() {
 	e.Use(middleware.SetRequestContextWithTimeout(timeoutContext))
 
 	// Prepare Repository
-	certificateRepo := pgsqlRepo.NewCertificateRepository(dbConn)
+	certRepo := pgsql.NewCertificateRepository(dbConn)
+
+	// Prepare libs
+	certAuth := emudhra.NewCertificateAuthority()
 
 	// Build usecase Layer
-	certificateUseCase := certificate.NewUseCase(certificateRepo)
+	certificateUseCase := certificate.NewUseCase(certRepo, certAuth)
 	rest.NewCertificateHandler(e, *certificateUseCase)
 
 	// Start Server

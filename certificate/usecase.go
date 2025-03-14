@@ -13,17 +13,26 @@ type CertificateRepository interface {
 	Update(certificate *entity.Certificate) (err error)
 }
 
-type UseCase struct {
-	certificateRepo CertificateRepository
+//go:generate mockery --name CertificateAuthority
+type CertificateAuthority interface {
+	Status() (err error)
+	Enroll() (err error)
+	Revoke() (err error)
+	Renew() (err error)
 }
 
-func NewUseCase(certificateRepo CertificateRepository) *UseCase {
-	return &UseCase{certificateRepo}
+type UseCase struct {
+	certRepo CertificateRepository
+	certAuth CertificateAuthority
+}
+
+func NewUseCase(certRepo CertificateRepository, certAuth CertificateAuthority) *UseCase {
+	return &UseCase{certRepo, certAuth}
 }
 
 func (c *UseCase) GetByID(id uint) (certificate *entity.Certificate, err error) {
 	// Find Certificate in DB
-	certificate, err = c.certificateRepo.Find(id)
+	certificate, err = c.certRepo.Find(id)
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +41,12 @@ func (c *UseCase) GetByID(id uint) (certificate *entity.Certificate, err error) 
 }
 
 func (c *UseCase) Enroll(certificate *entity.Certificate) (err error) {
-	/* TODO: Call Enroll CA lib */
+	c.certAuth.Enroll()
 
 	certificate.ExpiresAt = time.Now().AddDate(1, 0, 0)
+
 	// Persist Certificate to DB
-	err = c.certificateRepo.Save(certificate)
+	err = c.certRepo.Save(certificate)
 	if err != nil {
 		return err
 	}
@@ -48,7 +58,7 @@ func (c *UseCase) Revoke(certificate *entity.Certificate) (err error) {
 	/* TODO: Call Revoke CA lib */
 
 	// Delete Certificate from DB
-	err = c.certificateRepo.Delete(certificate)
+	err = c.certRepo.Delete(certificate)
 	if err != nil {
 		return err
 	}
@@ -63,13 +73,13 @@ func (c *UseCase) Renew(certificate *entity.Certificate) (err error) {
 	newCertificate := certificate
 
 	// Update old Certificate in DB
-	err = c.certificateRepo.Update(oldCertificate)
+	err = c.certRepo.Update(oldCertificate)
 	if err != nil {
 		return err
 	}
 
 	// Persist new Certificate to DB
-	err = c.certificateRepo.Save(newCertificate)
+	err = c.certRepo.Save(newCertificate)
 	if err != nil {
 		return err
 	}

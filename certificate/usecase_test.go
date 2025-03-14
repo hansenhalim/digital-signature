@@ -14,7 +14,7 @@ import (
 func TestGetByID(t *testing.T) {
 	oldTime, _ := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z07:00")
 
-	mockCertificateRepo := new(mocks.CertificateRepository)
+	mockCertRepo := new(mocks.CertificateRepository)
 	mockCertificate := &entity.Certificate{
 		ID:        1,
 		Name:      "IDAS CA DS G1",
@@ -22,18 +22,20 @@ func TestGetByID(t *testing.T) {
 		ExpiresAt: oldTime,
 	}
 
-	mockCertificateRepo.
+	mockCertRepo.
 		On("Find", mock.AnythingOfType("uint")).
 		Return(mockCertificate, nil).
 		Once()
 
-	certificateUseCase := certificate.NewUseCase(mockCertificateRepo)
+	mockCertAuth := new(mocks.CertificateAuthority)
+
+	certificateUseCase := certificate.NewUseCase(mockCertRepo, mockCertAuth)
 	certificate, err := certificateUseCase.GetByID(mockCertificate.ID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 
-	mockCertificateRepo.AssertExpectations(t)
+	mockCertRepo.AssertExpectations(t)
 }
 
 func TestEnroll(t *testing.T) {
