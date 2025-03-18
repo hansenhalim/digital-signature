@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
@@ -20,7 +18,6 @@ import (
 )
 
 const (
-	defaultTimeout = 30
 	defaultAddress = ":8080"
 )
 
@@ -58,15 +55,11 @@ func main() {
 
 	// prepare echo
 	e := echo.New()
-	e.Use(middleware.CORS)
-	timeoutStr := os.Getenv("CONTEXT_TIMEOUT")
-	timeout, err := strconv.Atoi(timeoutStr)
-	if err != nil {
-		log.Println("failed to parse timeout, using default timeout")
-		timeout = defaultTimeout
-	}
-	timeoutContext := time.Duration(timeout) * time.Second
-	e.Use(middleware.SetRequestContextWithTimeout(timeoutContext))
+
+	e.Use(middleware.CORS())
+	e.Use(middleware.Timeout())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	// Prepare Repository
 	certRepo := pgsql.NewCertificateRepository(dbConn)

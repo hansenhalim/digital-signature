@@ -43,7 +43,14 @@ func (r *CertificateHandler) GetByID(c echo.Context) error {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, certificate)
+	getCertRes := response.GetCertificate{
+		ID:        certificate.ID,
+		Name:      certificate.Name,
+		Issuer:    certificate.Issuer,
+		ExpiresAt: certificate.ExpiresAt,
+	}
+
+	return c.JSON(http.StatusOK, getCertRes)
 }
 
 func isRequestValid(m *request.EnrollCertificate) (bool, error) {
@@ -56,20 +63,21 @@ func isRequestValid(m *request.EnrollCertificate) (bool, error) {
 }
 
 func (r *CertificateHandler) Enroll(c echo.Context) (err error) {
-	var enrollRequest request.EnrollCertificate
-	err = c.Bind(&enrollRequest)
+	var enrollReq request.EnrollCertificate
+
+	err = c.Bind(&enrollReq)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	var ok bool
-	if ok, err = isRequestValid(&enrollRequest); !ok {
+	if ok, err = isRequestValid(&enrollReq); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	certificate := entity.Certificate{
-		Name:   enrollRequest.CertName,
-		Issuer: enrollRequest.CertIssuer,
+		Name:   enrollReq.CertName,
+		Issuer: enrollReq.CertIssuer,
 	}
 
 	err = r.UseCase.Enroll(&certificate)
@@ -77,13 +85,14 @@ func (r *CertificateHandler) Enroll(c echo.Context) (err error) {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	enrollResponse := response.EnrollCertificate{
-		CertificateName:      certificate.Name,
-		CertificateIssuer:    certificate.Issuer,
-		CertificateExpiresAt: certificate.ExpiresAt,
+	enrollRes := response.EnrollCertificate{
+		ID:        certificate.ID,
+		Name:      certificate.Name,
+		Issuer:    certificate.Issuer,
+		ExpiresAt: certificate.ExpiresAt,
 	}
 
-	return c.JSON(http.StatusCreated, enrollResponse)
+	return c.JSON(http.StatusCreated, enrollRes)
 }
 
 func getStatusCode(err error) int {
